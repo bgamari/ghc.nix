@@ -20,7 +20,7 @@ in
 # GHCIDE support on hold as we must use GHC 8.8 minimum for GHC development, and GHCIDE is not yet available for GHC 8.8
 # See https://github.com/cachix/ghcide-nix/issues/3
 # See https://github.com/alpmestan/ghc.nix/issues/64
-# , withIde   ? false
+, withIde   ? false
 , withHadrianDeps ? false
 , withDwarf  ? nixpkgs.stdenv.isLinux  # enable libdw unwinding support
 , withNuma   ? nixpkgs.stdenv.isLinux
@@ -42,9 +42,11 @@ let
 
     hspkgs = haskell.packages.${bootghc};
 
-    ghcide-src = fetchGhcIde ./nix/pins/ghcide-nix.src-json ;
+    #ghcide-src = fetchGhcIde ./nix/pins/ghcide-nix.src-json ;
 
-    ghcide = (import ghcide-src {})."ghcide-${bootghc}";
+    #ghcide = (import ghcide-src {})."ghcide-${bootghc}";
+
+    ghcide = nixpkgs.callPackage ./ghcide.nix { inherit bootghc; };
 
     ghc    = haskell.compiler.${bootghc};
 
@@ -72,7 +74,7 @@ let
       ++ optional withNuma numactl
       ++ optional withDwarf elfutils
       ++ optional withGhcid ghcid
-      # ++ optionals withIde [ghcide ccls bear]
+      ++ optionals withIde [ghcide ccls bear]
       ++ optional withDtrace linuxPackages.systemtap
       ++ (if (! stdenv.isDarwin)
           then [ pxz ]
