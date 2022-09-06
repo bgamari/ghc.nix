@@ -3,4 +3,12 @@ build:
   tags:
     - x86_64-linux
   script:
-    - nix build
+    - nix-shell ./. --argstr version "$VERSION" --run 'bash -c "\$GHC --version"'
+  parallel:
+    matrix:
+      - VERSION: "8.10"
+      - VERSION: "9.0"
+      - VERSION: "9.2"
+      - VERSION: "9.4"
+      - VERSION: "9.6"
+
