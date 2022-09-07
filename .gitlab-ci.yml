@@ -1,5 +1,5 @@
 build:
-  image: nixos/nix:2.3.12
+  image: nixos/nix:2.11.0-amd64
   tags:
     - x86_64-linux
   script:
