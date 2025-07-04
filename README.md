@@ -61,7 +61,7 @@ $ cabal update
 > `configure_ghc` runs `./configure $CONFIGURE_ARGS`. While this is technically
 > optional, this argument ensures that `configure` knows where the compiler's
 > dependencies (e.g. `gmp`, `libnuma`, `libdw`) are found, allowing the compiler
-> to be used even outsite of `nix-shell`. Plus, for the JavaScript cross
+> to be used even outside of `nix-shell`. Plus, for the JavaScript cross
 > compiler, `configure_ghc` actually runs the wrapper `emconfigure`!
 >
 > If you are using zsh and you want to run `./configure` directly, you must pass
