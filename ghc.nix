@@ -84,6 +84,17 @@ let
         });
       };
     };
+    # Some tests fail on i686. As this package comes from upstream nixpkgs,
+    # that's probably acceptable.
+    p11-kit =
+      if self.system == "i686-linux" then
+        super.p11-kit.overrideAttrs
+          (_old: {
+            doCheck = false;
+            doInstallCheck = false;
+          })
+      else
+        super.p11-kit;
   };
 
   pkgs = import nixpkgs { inherit system; overlays = [ overlay ]; };
