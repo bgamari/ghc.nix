@@ -36,6 +36,7 @@ args@{ system ? builtins.currentSystem
   # `gdb` should only be included if it is available on the current platform.
   && pkgs.lib.meta.availableOn system pkgs.gdb
 , withNuma ? (pkgsFor nixpkgs system).stdenv.isLinux
+, withZstd ? true
 , withDtrace ? (pkgsFor nixpkgs system).stdenv.isLinux
 , withGrind ? !((pkgsFor nixpkgs system).valgrind.meta.broken or false)
 , withPerf ? (pkgsFor nixpkgs system).stdenv.isLinux
@@ -193,6 +194,7 @@ let
     pkgs.cabal-install
     configureGhc
     validateGhc
+    pkgs.pkg-config
   ]
   ++ lib.optional withFindNoteDef findNoteDef
   ;
@@ -271,6 +273,10 @@ let
     "--with-system-libffi"
     "--with-ffi-includes=${crossPkgs.libffi.dev}/include"
     "--with-ffi-libraries=${crossPkgs.libffi.out}/lib"
+  ] ++ lib.optionals withZstd [
+    "--enable-ipe-data-compression"
+    "--with-libzstd-includes=${crossPkgs.zstd.dev}/include"
+    "--with-libzstd-libraries=${crossPkgs.zstd.out}/lib"
   ] ++ lib.optionals (crossTarget != null) [
     "--target=${crossTarget}"
   ];
@@ -287,6 +293,10 @@ hspkgs.shellFor {
   # The solution is from: https://github.com/NixOS/nix/issues/318#issuecomment-52986702
   LOCALE_ARCHIVE = if stdenv.isLinux then "${pkgs.glibcLocales}/lib/locale/locale-archive" else "";
   inherit CONFIGURE_ARGS;
+
+  env = lib.optionalAttrs withZstd {
+    PKG_CONFIG_PATH = "${crossPkgs.zstd.dev}/lib/pkgconfig";
+  };
 
   shellHook = ''
     # somehow, CC gets overridden so we set it again here.
